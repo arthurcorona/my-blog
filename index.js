@@ -3,47 +3,17 @@ const app = express()
 const mongoose = require('mongoose')
 const path = require('path')
 
-// user requesting the post name
 
-app.get('/:title', async (req, res) => {
-  let title = req.params.title
-  try{
-    let doc = await Post.findOne({ title })
-    res.redirect(doc.url) 
-  }
-  catch(error){
-    res.send(error)
-  }
-})
+const userRoute = require('./routes/userRoute')
 
-const User = require('./models/User')
+const postRoute = require('./routes/postRoute')
 
-
-//let user = new User({
-//  username: "Corona",
-//  password:"admin",
-//  email:"coronarex@proton.me"
-//})
-
-//user.save().then(doc => {
-//  console.log(doc);
-//}).catch(error => {
-//  console.log(error);
-//})
-
-//definindo a rota principal (do ejs)
 
 router = express.Router()
 
 app.get("/", (req, res) => {
   res.render("index")
 })
-
-//models and routes
-
-// const User = require('./models/User')
-
-// const UserRoute = require('./routes/userRoute')
 
 // connecting to mongo
 
@@ -59,8 +29,6 @@ mongoose.set("strictQuery", true);
 
 app.set('view engine', 'ejs')
 app.set('views', path.join(__dirname, 'templates'))
-
-//creating properties to document
 
 //running server 
 
