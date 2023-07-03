@@ -3,6 +3,34 @@ const app = express()
 const mongoose = require('mongoose')
 const path = require('path')
 
+// user requesting the post name
+
+app.get('/:title', async (req, res) => {
+  let title = req.params.title
+  try{
+    let doc = await Post.findOne({ title })
+    res.redirect(doc.url) 
+  }
+  catch(error){
+    res.send(error)
+  }
+})
+
+const User = require('./models/User')
+
+
+//let user = new User({
+//  username: "Corona",
+//  password:"admin",
+//  email:"coronarex@proton.me"
+//})
+
+//user.save().then(doc => {
+//  console.log(doc);
+//}).catch(error => {
+//  console.log(error);
+//})
+
 //definindo a rota principal (do ejs)
 
 router = express.Router()
@@ -22,7 +50,7 @@ app.get("/", (req, res) => {
 main().catch(err => console.log(err));
  
 async function main() {
-  await mongoose.connect('mongodb://127.0.0.1:27017/testingDB');
+  await mongoose.connect('mongodb://127.0.0.1:27017/my-blog');
 }
 
 mongoose.set("strictQuery", true);
