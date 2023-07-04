@@ -1,15 +1,26 @@
+const bcrypt = require('bcrypt')
+const jwt = require('jsonwebtoken')
 const User = require('../models/User')
 
-exports.getSignUp = (req, res, next) => {
-    res.render('signup', {path:'/signup', pageTitle: 'Sign Up', name:'TTestTe' })
+
+async function emailAlreadyExists() {
+    const selectedUser = await User.findOne({
+        email:req.body.email
+    })
+
+    if(selectedUser) {
+        return res.status(400).send("Email já está em uso")
+    }
 }
 
-exports.postSignUp = (req, res, next) => {
-    const newUser = new User({
+const register = async(req, res) => { 
+
+    emailAlreadyExists()
+
+    const user = new User({
         username: req.body.username,
         email: req.body.email,
-        password: req.res.password,
-        date: req.res.date
+        password: bcrypt.hashSync(req.body.password),
     })
     newUser.save().then(() => {
         res.redirect('/')
@@ -17,10 +28,25 @@ exports.postSignUp = (req, res, next) => {
     .catch(error => {
         res.send(error)
     })
-}
+ }
 
-// to check if the username and the email exists
+ const login = async(req, res) => {
 
-//if(username && email) {
-//    User.findOne()
-//}
+    const selectedUser = await User.findOne({
+        email:req.body.email
+    })
+    if(!selectedUser) {
+        return res.status(400).send("Email e/ou senha estão incorretos")
+    }
+
+    const passwordAndUserMatch = bcrypt(req.body.password,  selectedUser.password) 
+    if(!passwordAndUserMatch) {
+        return res.status(400).send("Email já está em uso")
+        const token = jwt.sign({_id:selectedUser._id, email:selectedUser.email}, process.env.TOKEN_SECRET, {expiresIn: 60})
+        res.header('authoration-token', token)
+        res.redirect('/')
+    }
+ }
+ 
+
+module.exports = { register, login }

@@ -39,10 +39,8 @@ mongoose.set("strictQuery", true);
 app.set('view engine', 'ejs')
 app.set('views', path.join(__dirname, 'templates'))
 
-//running server 
+//running server  
 
-const PORT = 8080  
-
-app.listen(PORT, () => {
-  console.log("Server running on port:", PORT);
+app.listen(process.env.PORT, () => {
+  console.log("Server running on PORT: ", process.env.PORT);
 })
