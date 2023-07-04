@@ -1,3 +1,4 @@
+require('dotenv').config
 const express = require('express')
 const app = express()
 const mongoose = require('mongoose')
@@ -23,31 +24,6 @@ let testUser = new User({
   password: "Password"
 });
 
-// save user to database
-testUser.save()
-  .then(() => {
-    console.log('Usuário salvo com sucesso!');
-    
-    // fetch user and test password verification
-    return User.findOne({ username: 'jmar777' });
-  })
-  .then(user => {
-    if (user) {
-      user.comparePassword('Password123', function(err, isMatch) {
-        if (err) throw err;
-        console.log('Password123:', isMatch); // -> Password123: true
-      });
-
-      user.comparePassword('123Password', function(err, isMatch) {
-        if (err) throw err;
-        console.log('123Password:', isMatch); // -> 123Password: false
-      });
-    }
-  })
-  .catch(err => {
-    console.error(err);
-  });
-  
 // connecting to mongo
 
 main().catch(err => console.log(err));
