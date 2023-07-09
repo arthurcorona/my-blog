@@ -10,7 +10,6 @@ const User = require('./models/User')
 
 const postRoute = require('./routes/postRoute')
 
-
 router = express.Router()
 
 app.get("/", (req, res) => {
@@ -41,6 +40,12 @@ app.set('views', path.join(__dirname, 'templates'))
 
 //running server  
 
-app.listen(process.env.PORT, () => {
-  console.log("Server running on PORT: ", process.env.PORT);
+PORT  = 8080
+
+app.listen(PORT, () => {
+  console.log("Server running on port: ", PORT);
 })
+
+//app.listen(process.env.PORT, () => {
+  //console.log("Server running on PORT: ", process.env.PORT);
+//})
