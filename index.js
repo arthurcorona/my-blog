@@ -16,17 +16,20 @@ app.get("/", (req, res) => {
   res.render("index")
 })
 
-
 // create a user a new user
 let testUser = new User({
   username: "jmar777",
   password: "Password"
 });
 
+//
+app.use('/user', express.json(), userRoute)
+
+
 // connecting to mongo
 
 main().catch(err => console.log(err));
- 
+
 async function main() {
   await mongoose.connect('mongodb://127.0.0.1:27017/my-blog');
 }
@@ -38,6 +41,21 @@ mongoose.set("strictQuery", true);
 app.set('view engine', 'ejs')
 app.set('views', path.join(__dirname, 'templates'))
 app.use('/public', express.static('public'))
+
+//
+
+app.get("/", (req, res) => {
+  res.render("")
+})
+
+app.get("/signup", (req, res) => {
+  res.render("signup")
+})
+
+app.get("/login", (req, res) => {
+  res.render("login")
+})
+
 //running server  
 
 PORT  = 8080

@@ -205,3 +205,17 @@ section .search-button {
         
     }
 }
+
+
+/*SIGN UP*/
+
+.signup-section .signup-box .title {
+    color: #00c507;
+}
+
+
+
+.signup-section .grid2 {
+    display: grid;
+    grid-template-columns: 50% 50%;
+}
