@@ -37,7 +37,7 @@ mongoose.set("strictQuery", true);
 
 app.set('view engine', 'ejs')
 app.set('views', path.join(__dirname, 'templates'))
-
+app.use('/public', express.static('public'))
 //running server  
 
 PORT  = 8080
