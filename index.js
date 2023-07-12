@@ -24,7 +24,9 @@ let testUser = new User({
 
 //
 app.use('/user', express.json(), userRoute)
-
+app.get('/admin', (req,res) => {
+  res.send('Somente o Corona pode ver aqui')
+})
 
 // connecting to mongo
 

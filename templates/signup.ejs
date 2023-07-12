@@ -1,3 +1,4 @@
+<html>
 <head>
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
@@ -21,23 +22,36 @@
     
     <main>
         
-        <p class="adress-page">SIGN UP ></p>
+        <p class="adress-page">REGISTER ></p>
 
-        <section class="signup-section">
+        <section class="register-section">
             <div class="grid2">
-                <div class="signup-box">
-                    <div class="signup-top">
-                        <h2 class="title">Cadastre-se</h2>
-                    </div>
-                    <div class="signup-bottom">
-                        <input class="" type="text" placeholder="Username">
-                        <input class="" type="email" placeholder="Email">
-                        <input class="" type="password" placeholder="Senha" />
-                
-                        <button type="submit">Cadastre-se</button>
+                <div class="left-grid">
+                    <div class="register-box">
+                        <div class="register-top">
+                            <h2 class="title">Cadastre-se</h2>
+                        </div>
+                        <div class="register-bottom">
+                            <div class="">
+                                <input class="" type="text" placeholder="   Username">
+                            </div>
+                            <div>
+                                <input class="" type="email" placeholder="   Email">
+                            </div>
+                            <div>
+                                <input class="password" type="password" placeholder="   Senha" />
+                            </div>
+                            <div>
+                                <input class="confirm-password" type="password" placeholder="   Confirmar Senha" />
+                            </div>  
+                            <p class="incorrect-password">As senhas não coincidem!</p>
+                            <p class="weakness-password">Senha muito fraca!</p>
+
+                            <button class="register-button" onclick="passwordMatch()" type="submit">Criar Conta</button>
+                        </div>
                     </div>
                 </div>
-                <div class="advertisement">
+                <div class="right-grid">
                     TORNE-SE UM CORONITA
                 </div>
             </div>
@@ -47,3 +61,5 @@
     </main>
 </body>
 <script src="../public/script/index.js"></script>
+<script src="../public/script/register.js"></script>
+</html>

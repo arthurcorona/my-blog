@@ -1,4 +1,6 @@
-
+function openHomePage() {
+    window.location.href = "/"
+}
 
 function openContactPage() {
     window.location.href = "/contact"
@@ -9,7 +11,7 @@ function openAboutPage() {
 }
 
 function openLoginPage() {
-    window.location.href = "/signin"
+    window.location.href = "/login"
 }
 
 function searchOpen() {
@@ -19,3 +21,4 @@ function searchOpen() {
 function showPostsSidebar() {
 
 }
+

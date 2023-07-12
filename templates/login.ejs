@@ -1,0 +1,60 @@
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="../public/style/index.css" type="text/css" />
+    <link rel="stylesheet" href="https://unicons.iconscout.com/release/v4.0.8/css/line.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;1,100;1,200;1,300;1,400;1,500;1,600;1,700&family=Titillium+Web:ital,wght@0,200;0,300;0,400;0,600;0,700;0,900;1,200;1,300;1,400;1,600;1,700&display=swap" rel="stylesheet">
+    <title>Home</title>
+</head>
+<body class="dark">
+    <header>
+        <div class="logo">
+            <img class="logo-img" src="" alt="">
+            <div class="logo-text">CAVERNA DO CORONA</div>
+        </div>
+    </header>
+
+    <%-include('./views_util/nav.ejs')%>
+    
+    <main>
+        
+        <p class="adress-page">LOGIN ></p>
+
+        <section class="register-section">
+            <div class="grid2">
+                <div class="left-grid">
+                    <div class="register-box">
+                        <div class="register-top">
+                            <h2 class="title">Entrar</h2>
+                        </div>
+                        <div class="register-bottom">
+                            <div>
+                                <input class="" type="email" placeholder="   Email">
+                            </div>
+                            <div>
+                                <input class="password" type="password" placeholder="   Senha" />
+                            </div>
+
+                            <button class="register-button" onclick="login()" type="submit">Login</button>
+                        
+                            <p class="no-account">Não tem uma conta?<a href="./signup"> Crie Já</a></p>
+
+                        </div>
+                    </div>
+                </div>
+                <div class="right-grid">
+                    SEJA BEM VINDO(A), CARO CORONITA
+                </div>
+            </div>
+        </section>
+
+
+    </main>
+</body>
+<script src="../public/script/index.js"></script>
+<script src="../public/script/register.js"></script>
+</html>

@@ -207,15 +207,64 @@ section .search-button {
 }
 
 
-/*SIGN UP*/
+/*register*/
 
-.signup-section .signup-box .title {
+.register-section .register-box .title {
     color: #00c507;
 }
 
 
 
-.signup-section .grid2 {
+.register-section .grid2 {
     display: grid;
     grid-template-columns: 50% 50%;
+}
+.register-section .left-grid {
+    text-align: center;
+
+}
+
+
+.register-section .register-box {
+
+}
+
+.register-section .register-box input {
+    border-radius: 8px;
+    width: 200px;
+    margin-bottom: 10px;
+    height: 30px;
+    margin: none;
+}
+
+.register-section .register-box .register-button{
+    color: var(--textColor);
+    background-color: var(--selected);
+    width:150px;
+    height: 30px;
+    border-radius: 12px;
+    font-weight: 500;
+    font-size: 18px;
+}
+
+.register-section .register-box p {
+    color: var(--textColor);
+    display: none;
+}
+
+.register-section .register-box .no-account{
+    color: var(--textColor);
+    display: block;
+}
+
+.register-section .register-box a {
+    color: var(--textColor);
+    font-weight: 700;
+    
+}
+
+.register-section .register-box .register-button:hover {
+    background-color: var(--textColor);
+    color: var(--selected);
+    cursor: pointer;
 }
