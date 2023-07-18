@@ -4,6 +4,7 @@ const app = express()
 const mongoose = require('mongoose')
 const path = require('path')
 
+const adminRoute = require('./routes/adminRoute')
 
 const userRoute = require('./routes/userRoute')
 const User = require('./models/User')
@@ -16,17 +17,9 @@ app.get("/", (req, res) => {
   res.render("index")
 })
 
-// create a user a new user
-let testUser = new User({
-  username: "jmar777",
-  password: "Password"
-});
-
 //
 app.use('/user', express.json(), userRoute)
-app.get('/admin', (req,res) => {
-  res.send('Somente o Corona pode ver aqui')
-})
+app.use('/admin', express.json(), adminRoute)  
 
 // connecting to mongo
 

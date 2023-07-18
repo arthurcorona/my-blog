@@ -1,9 +1,15 @@
+
+
+let navItem = document.querySelector('.nav-item')
+
+
 function openHomePage() {
     window.location.href = "/"
 }
 
 function openContactPage() {
     window.location.href = "/contact"
+
 }
 
 function openAboutPage() {
@@ -20,5 +26,9 @@ function searchOpen() {
 
 function showPostsSidebar() {
 
+}
+
+function selectPageNavMenu() {
+    
 }
 
