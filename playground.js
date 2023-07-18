@@ -2,10 +2,10 @@
 const jwt = require('jsonwebtoken')
 
 const user = {
-    id:"1",
+    id:"2",
     username: "xuros",
-    email:"xurim@gmail.com",
-    password:"123456"
+    email:"xurixm@gmail.com",
+    password:"123"
 }
 
 
@@ -15,7 +15,7 @@ const user = {
 const secretToken = "kwnowledge"
 
 function createToken() {
-    const token = jwt.sign({id:user.id, email:user.email}, secretToken, {expiresIn: 60})
+    const token = jwt.sign({id:user.id, email:user.email})
     console.log(token);
 }
 
