@@ -15,7 +15,7 @@ const user = {
 const secretToken = "kwnowledge"
 
 function createToken() {
-    const token = jwt.sign({id:user.id, email:user.email})
+    const token = jwt.sign({id:user.id, email:user.email}, secretToken, {expiresIn: 600})
     console.log(token);
 }
 

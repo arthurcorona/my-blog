@@ -4,8 +4,13 @@ form = {
     confirmPassword: () => document.querySelector('.confirm-password').value
 }
 
+function weaknessPassword() {
+    if(form.password >= 8){
+        
+    }   
+}
+
 function passwordMatch() {
-    
     
     if(form.password() !== form.confirmPassword()) {
         let noMatchMessage = document.querySelector('.incorrect-password')
@@ -14,8 +19,4 @@ function passwordMatch() {
     else {
         console.log("Senha deu match");
     }
-}
-
-function weaknessPassword() {
-    
 }

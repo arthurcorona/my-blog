@@ -32,18 +32,21 @@
                             <h2 class="title">Entrar</h2>
                         </div>
                         <div class="register-bottom">
-                            <div>
-                                <input class="" type="email" placeholder="   Email">
-                            </div>
-                            <div>
-                                <input class="password" type="password" placeholder="   Senha" />
+                            <form action="/login" method="POST">
+
+                                <div>
+                                    <input name="email" class="" type="email" placeholder="   Email">
+                                </div>
+                                <div> 
+                                    <input name="password" class="password" type="password" placeholder="   Senha" />
+                                </div>
+
+                                <button class="register-button" onclick="login()" type="submit">Login</button>
+                            
+                                <p class="no-account">Não tem uma conta?<a href="/register"> Crie Já</a></p>
                             </div>
 
-                            <button class="register-button" onclick="login()" type="submit">Login</button>
-                        
-                            <p class="no-account">Não tem uma conta?<a href="./signup"> Crie Já</a></p>
-
-                        </div>
+                        </form>
                     </div>
                 </div>
                 <div class="right-grid">

@@ -32,22 +32,21 @@
                             <h2 class="title">Cadastre-se</h2>
                         </div>
                         <div class="register-bottom">
-                            <div class="">
-                                <input class="" type="text" placeholder="   Username">
-                            </div>
-                            <div>
-                                <input class="" type="email" placeholder="   Email">
-                            </div>
-                            <div>
-                                <input class="password" type="password" placeholder="   Senha" />
-                            </div>
-                            <div>
-                                <input class="confirm-password" type="password" placeholder="   Confirmar Senha" />
-                            </div>  
-                            <p class="incorrect-password">As senhas não coincidem!</p>
-                            <p class="weakness-password">Senha muito fraca!</p>
+                            <form action="/register" method="POST">
+                                <div>
+                                    <input name="username" class="" type="text" required placeholder="   Username">
+                                <div>
+                                    <input name="email" class="" type="email" required placeholder="   Email" >
+                                </div>
+                                    <input name="password" class="password" required type="password" placeholder="   Senha" >
+                                <div>
+                                    <input class="confirm-password" required type="password" placeholder="   Confirmar Senha" />
+                                </div>
+                                <p class="incorrect-password">As senhas não coincidem!</p>
+                                <p class="weakness-password">Senha muito fraca!</p>
 
-                            <button class="register-button" onclick="passwordMatch()" type="submit">Criar Conta</button>
+                                <button class="register-button" onclick="passwordMatch()" type="submit">Criar Conta</button>
+                            </form>
                         </div>
                     </div>
                 </div>
