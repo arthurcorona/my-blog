@@ -5,11 +5,12 @@ const mongoose = require('mongoose')
 const path = require('path')
 
 const adminRoute = require('./src/routes/adminRoute')
-
 const userRoute = require('./src/routes/userRoute')
+const postRoute = require('./src/routes/postRoute')
+
 const User = require('./src/models/User')
 
-const postRoute = require('./src/routes/postRoute')
+
 
 router = express.Router()
 
@@ -32,15 +33,7 @@ main().catch(err => console.log(err));
 
 async function main() {
   await mongoose.connect(process.env.DB_URL);
-  console.log(process.env.DB_URL);
-
 }
-
-// mongoose.connect(process.env.mongodb, {
-//   useUnifiedTopology: true,
-//   useNewUrlParser: true,
-//   useCreateIndex: true,
-// });
 
 mongoose.set("strictQuery", true);
 
@@ -76,6 +69,3 @@ app.listen(PORT, () => {
   console.log("Server running on port: ", PORT);
 })
 
-//app.listen(process.env.PORT, () => {
-  //console.log("Server running on PORT: ", process.env.PORT);
-//})

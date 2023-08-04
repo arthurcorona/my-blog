@@ -1,53 +1,67 @@
 const mongoose = require('mongoose')
-const bcrypt = require('bcrypt')
-const SALT_WORK_FACTOR = 10
+const bcrypt = require('bcrypt');
+const jwt = require('jsonwebtoken')
 
 const Schema = mongoose.Schema
 
 const UserSchema = new Schema({
-    username: { 
-        type: String
-    },
-    admin: {
-        type: Boolean, default: false
-    },
-    email: {
-        type: String
-    },
-    password: {
-        type: String
-    },
-    timestamp: {
-        type: Date, default: Date.now
-    }
+    username: { type: String },
+    admin: { type: Boolean, default: false },
+    email: { type: String },
+    password: { type: String },
+    timestamp: { type: Date, default: Date.now },
+    tokens: [{
+        token: { type: String }, 
+    }],
+    loginAttempts: { type: Number, default: 0 },
+    lockUntil: { type: Number }
 });
 
 UserSchema.pre('save', function(next) {
   let user = this;
 
-  // only hash the password if it has been modified (or is new)
   if (!user.isModified('password')) return next();
 
-  // generate a salt
-  bcrypt.genSalt(SALT_WORK_FACTOR, (err, salt) => {
+  bcrypt.genSalt(process.env.SALT_WORK_FACTOR, (err, salt) => {
       if (err) return next(err);
 
-      // hash the password using our new salt
       bcrypt.hash(user.password, salt, (err, hash) => {
           if (err) return next(err);
 
-          // override the cleartext password with the hashed one
           user.password = hash;
           next();
       });
   });
 });
 
-UserSchema.methods.comparePassword = (candidatePassword, cb) => {
-    bcrypt.compare(candidatePassword, this.password, (err, isMatch) => {
-        if (err) return cb(err);
-        cb(null, isMatch);
-    });
+
+
+
+UserSchema.methods.generateAuthToken = async function() {
+    const user = this
+    const token = jwt.sign({ _id: user._id, username: user.username, email:user.email }, process.env.TOKEN_SECRET)
+    user.tokens = user.tokens.concat({ token: token })
+    await user.save();
+}
+
+UserSchema.statics.findByCredentials = async (email, password) => {
+    const userExists = await User.findOne({email, password})   
+}
+
+UserSchema.methods.comparePassword = function(candidatePassword, cb) { 
+    bcrypt.compare(candidatePassword, this.password, function(err, isMatch) { 
+        if (err) return cb(err); cb(null, isMatch); 
+    }); 
 };
 
+
+
+UserSchema.methods.failedLogin = {
+    NOT_FOUND: 0,
+    PASSWORD_INCORRECT: 1,
+    MAX_ATTEMPTS: 4
+}
+
+
+            
 module.exports = User = mongoose.model("User", UserSchema)
