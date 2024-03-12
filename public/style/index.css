@@ -134,10 +134,21 @@ header {
     margin-bottom: 8px;
 }
 
+/* main page */
+
+.text, .welcome {
+    color: var(--textColor);
+}
+
+
+.link {
+    color: var(--selected);
+    text-decoration: underline;
+}
 
 /*  posts content  */
 
-main {
+main { 
     margin-left: 240px;
 }
 
