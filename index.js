@@ -10,14 +10,11 @@ const postRoute = require('./src/routes/postRoute')
 
 const User = require('./src/models/User')
 
-
-
 router = express.Router()
 
 app.use(express.urlencoded({ extended: true }))
 app.use(express.json())
 app.use(express.json({ type: 'application/vnd.api+json' }))
-
 
 app.get("/", (req, res) => {
   res.render("index")
@@ -25,7 +22,7 @@ app.get("/", (req, res) => {
 
 app.use('/', express.urlencoded({extended:true}), userRoute)
 //app.use('/', express.json(), userRoute) this is to json files
-app.use('/admin', express.json(), adminRoute)  
+app.use('/admin', express.json(), adminRoute)
 
 // connecting to mongo
 
@@ -49,6 +46,12 @@ app.get('/', (req, res) => {
   res.render('')
 })
 
+
+app.get('/about', (req, res) => {
+  res.render('about')
+})
+
+
 app.get('/register', (req, res) => {
   res.render('register')
 })
@@ -61,11 +64,10 @@ app.get('/posts', (req, res) => {
   res.render('/posts')
 })
 
-//running server  
+//running server
 
 PORT  = process.env.PORT || 3000
 
 app.listen(PORT, () => {
   console.log("Server running on port: ", PORT);
 })
-
