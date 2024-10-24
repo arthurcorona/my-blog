@@ -21,7 +21,7 @@ function searchOpen() {
 }
 
 function showPostsSidebar() {
-
+    window.location.href = "/posts"
 }
 
 function selectPageNavMenu() {
