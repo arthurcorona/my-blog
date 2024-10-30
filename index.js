@@ -29,7 +29,7 @@ async function main() {
   await mongoose.connect(process.env.DB_URL);
 }
 
-mongoose.set("strictQuery", true);
+//mongoose.set("strictQuery", true);
 
 // ejs configuration
 
@@ -61,7 +61,7 @@ app.get('/login', (req, res) => {
 app.get('/posts', (req, res) => {
   const post = {
     title: "titulo teste",
-    description: "esse e o texto da descrição",
+    description: "esse e o texto da aaaadescrição",
   }
 
   res.render('posts', { post });
