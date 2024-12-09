@@ -1,7 +1,4 @@
-
-
 let navItem = document.querySelector('.nav-item')
-
 
 function openHomePage() {
     window.location.href = "/"
@@ -9,7 +6,6 @@ function openHomePage() {
 
 function openContactPage() {
     window.location.href = "/contact"
-
 }
 
 function openAboutPage() {
@@ -31,4 +27,3 @@ function showPostsSidebar() {
 function selectPageNavMenu() {
     
 }
-
