@@ -1,14 +1,27 @@
 <!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
-</head>
-<body>
+<html lang="pt-br">
+    <head>
+        <meta charset="UTF-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <link rel="stylesheet" href="../public/style/index.css" type="text/css" />
+        <link rel="stylesheet" href="https://unicons.iconscout.com/release/v4.0.8/css/line.css">
+        <link rel="preconnect" href="https://fonts.googleapis.com">
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;1,100;1,200;1,300;1,400;1,500;1,600;1,700&family=Titillium+Web:ital,wght@0,200;0,300;0,400;0,600;0,700;0,900;1,200;1,300;1,400;1,600;1,700&display=swap" rel="stylesheet">
+        <title>Posts</title>
+    </head>
+<body class="dark">
+    <header>
+        <div class="logo">
+            <img class="logo-img" src="" alt="">
+            <div class="logo-text">CORONA ACADEMY</div>
+        </div>
+    </header>
+
+    <%-include('./views_util/nav.ejs')%>
+    
     <main>
-        
-        <p class="adress-page">HOME ></p>
 
         <section class="search-section">
             <input class="input-search" placeholder="Buscar Post" type="text" />
@@ -32,6 +45,12 @@
                         
                         </li>
                     </a>
+
+                    <div>
+                        <h1>teste</h1>
+                        <div class="post-title"><%= post.title %></div>
+                        <div class="post-description"><%= post.description %></div>
+                    </div>
 
                     <a href="">
                         <li class="post">
@@ -61,7 +80,9 @@
             
         </section>
 
-        <div class="teste"></div>
+
+
     </main>
 </body>
+<script src="../public/script/index.js"></script>
 </html>
