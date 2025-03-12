@@ -16,12 +16,11 @@ app.use(express.urlencoded({ extended: true }))
 app.use(express.json())
 app.use(express.json({ type: 'application/vnd.api+json' }))
 
-<<<<<<< HEAD
-app.get("/", (req, res) => {
-  res.render("index")
-})
-=======
->>>>>>> 984df85c44baa62c407ad498b7d430f62e5452dd
+//<<<<<<</ HEAD
+//app.get("/", (req, res) => {
+//  res.render("index")
+//})
+//=======>>>>>>> 984df85c44baa62c407ad498b7d430f62e5452dd
 
 app.use('/', express.urlencoded({extended:true}), userRoute)
 //app.use('/', express.json(), userRoute) this is to json files
@@ -64,8 +63,7 @@ app.get('/login', (req, res) => {
 })
 
 
-<<<<<<< HEAD
-=======
+
 app.get('/posts', (req, res) => {
   const post = {
     title: "titulo teste",
@@ -75,11 +73,11 @@ app.get('/posts', (req, res) => {
   res.render('posts', { post });
 });
 
+
 //app.get('/posts', (req, res) => {
 //  res.render('/posts')
 //})
 
->>>>>>> 984df85c44baa62c407ad498b7d430f62e5452dd
 //running server
 
 PORT  = process.env.PORT || 3000

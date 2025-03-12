@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" xml:space="preserve" viewBox="0 0 100 100" id="Down">
+  <g id="_x37_7_Essential_Icons" fill="#000000" class="color000000 svgShape">
+    <path id="Down_Arrow" d="M67.9 45L51 61.9c-.4.4-.9.6-1.4.6-.5 0-1-.2-1.4-.6L32.1 45.8c-.8-.8-.8-2 0-2.8.8-.8 2-.8 2.8 0l14.7 14.7 15.5-15.5c.8-.8 2-.8 2.8 0 .8.7.8 2 0 2.8zM88 50c0 21-17 38-38 38S12 71 12 50s17-38 38-38 38 17 38 38zm-4 0c0-18.8-15.2-34-34-34S16 31.2 16 50s15.2 34 34 34 34-15.2 34-34z" fill="#000000" class="color000000 svgShape"></path>
+  </g>
+  <g id="Info" fill="#000000" class="color000000 svgShape">
+    <path id="BORDER" fill="#ffffff" d="M944-1210V474H-840v-1684H944m8-8H-848V482H952v-1700z" class="color0000ff svgShape"></path>
+  </g>
+</svg>

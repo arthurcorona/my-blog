@@ -15,14 +15,13 @@
     --darkTwo: #0c0b18;
     --lightOne: #919191;
     --lightTwo: #aaa;
-  
 }
   
 .dark {
     --mainColor: #000000;
     --textColor: #fff;
     --hoverColor: #e3d5cabd;
-    --backgroundColor: #1b1b1f;
+    --backgroundColor: black;
     --selected: #00c507;
     --darkOne: #2d2a3b;
     --darkTwo: #a59a9a;
@@ -44,6 +43,8 @@ header {
 .logo-text {
     color: var(--selected);
 }
+
+
 
 .sidebar {
     position: fixed;
@@ -133,7 +134,7 @@ header {
     letter-spacing: 1px;
     margin-bottom: 8px;
 }
-
+*/
 /* main page */
 
 .text, .welcome {
@@ -279,3 +280,6 @@ section .search-button {
     color: var(--selected);
     cursor: pointer;
 }
+
+/**/
+
