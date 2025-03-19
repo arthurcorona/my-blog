@@ -35,42 +35,41 @@ window.onload = function() {
 //posts counter
 
 document.addEventListener("DOMContentLoaded", () => {
-document.addEventListener("click", async (event) => {
-    if (event.target.classList.contains("post-rating-button")) {
-        const button = event.target;
-        const post = button.closest(".post");
+    document.querySelectorAll(".post").forEach(post => {
         const postId = post.getAttribute("data-post-id");
+        const upvoteButton = post.querySelector(".upvote");
+        const downvoteButton = post.querySelector(".downvote");
+        const upvoteCount = document.getElementById(`upvote-count-${postId}`);
+        const downvoteCount = document.getElementById(`downvote-count-${postId}`);
 
-        if (!postId) {
-            console.error("Erro: Post sem ID!");
-            return;
+        let savedVotes = JSON.parse(localStorage.getItem(`votes-${postId}`)) || { up: 0, down: 0, userVote: null };
+        upvoteCount.textContent = savedVotes.up;
+        downvoteCount.textContent = savedVotes.down;
+        
+        if (savedVotes.userVote === "upvote") upvoteButton.classList.add("selected");
+        if (savedVotes.userVote === "downvote") downvoteButton.classList.add("selected");
+
+        function vote(type) {
+            if (savedVotes.userVote === type) return; 
+
+            if (savedVotes.userVote === "upvote") savedVotes.up--;
+            if (savedVotes.userVote === "downvote") savedVotes.down--;
+
+            if (type === "upvote") savedVotes.up++;
+            if (type === "downvote") savedVotes.down++;
+
+            savedVotes.userVote = type; 
+            upvoteCount.textContent = savedVotes.up;
+            downvoteCount.textContent = savedVotes.down;
+
+            localStorage.setItem(`votes-${postId}`, JSON.stringify(savedVotes));
+
+            upvoteButton.classList.remove("selected");
+            downvoteButton.classList.remove("selected");
+            post.querySelector(`.${type}`).classList.add("selected");
         }
 
-        const ratingContainer = button.closest(".post-rating");
-        const isUpvote = button.classList.contains("upvote");
-        const countSpan = ratingContainer.querySelector(".post-rating-count");
-
-        if (!countSpan) {
-            console.error("Erro: Contador de votos não encontrado.");
-            return;
-        }
-
-        try {
-            const response = await fetch(`/posts/${postId}/${isUpvote ? "upvote" : "downvote"}`, {
-                method: "POST"
-            });
-
-            const data = await response.json();
-
-            if (data.success) {
-                countSpan.textContent = data.newCount;
-            } else {
-                console.error("Erro ao votar:", data);
-            }
-        } catch (error) {
-            console.error("Erro na requisição:", error);
-        }
-    }
+        upvoteButton.addEventListener("click", () => vote("upvote"));
+        downvoteButton.addEventListener("click", () => vote("downvote"));
+    });
 });
-});
-

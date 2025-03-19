@@ -69,7 +69,7 @@ header {
     letter-spacing: 3px;
     border-radius: 10px;
     transition: all .2s;
-}
+}*/
 
 .sidebar button i {
     font-size: 20px;
@@ -162,7 +162,7 @@ main {
 .posts {
     display: inline-block;
 }
-
+/*
 .post{
     display: inline-block;
     width: 400px;
@@ -197,7 +197,7 @@ main {
 .post:hover{
     
 }
-
+*/
 /*  */
 
 section .search-section {
@@ -301,7 +301,6 @@ cite {
     font-style: italic;
 }
 
-/* Estilizando as tabelas para parecerem um terminal */
 table {
     width: 100%;
     border-collapse: collapse;
@@ -326,18 +325,15 @@ a:hover {
     text-shadow: 0px 0px 5px green;
 }
 
-/* Estilo para as datas */
 .data {
     font-weight: bold;
     color: darkgreen;
 }
 
-/* Ajustando os posts */
 .post {
     color: lightgreen;
 }
 
-/* Criando um efeito de terminal piscando */
 @keyframes blink {
     50% { opacity: 0; }
 }
@@ -346,7 +342,6 @@ a:hover {
     animation: blink 1s step-start infinite;
 }
 
-/* posts counter */
 
 .post-rating:not(.post-rating-selected) > .post-rating-button:hover {
     color: #fff;
@@ -354,7 +349,6 @@ a:hover {
 
 }
 
-/* Estilizando o container do post */
 .post-container {
     display: flex;
     justify-content: space-between;
@@ -362,30 +356,29 @@ a:hover {
     width: 100%;
 }
 
-/* Contêiner para os botões de upvote e downvote */
+
 .post-rating-container {
     display: flex;
-    flex-direction: column; /* Organiza os botões verticalmente */
-    align-items: center; /* Centraliza os botões */
-    margin-left: auto; /* Joga para a direita */
+    flex-direction: column;
+    align-items: center; 
+    margin-left: auto;    
 }
 
-/* Estilizando os botões de upvote e downvote */
+
 .post-rating {
     display: flex;
     align-items: center;
-    gap: 5px; /* Espaço entre ícone e número */
+    gap: 5px; 
 }
 
 .post-rating-button {
-    width: 16px;
-    height: 16px;
+    width: 26px;
+    height: 26px;
     cursor: pointer;
-    filter: invert(1); /* Deixa os ícones brancos */
     transition: transform 0.2s ease-in-out;
+    filter: brightness(0) invert(1);
 }
 
-/* Efeito de hover nos botões */
 .vote:hover {
     transform: scale(1.2);
 }
