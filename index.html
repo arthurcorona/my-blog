@@ -6,7 +6,63 @@
     <title>Document</title>
     
 </head>
+
+<script>
+
+    window.onload = function() {
+        console.log("teste");
+    };
+    
+    //posts counter
+
+    document.addEventListener("DOMContentLoaded", () => {
+    document.addEventListener("click", async (event) => {
+        if (event.target.classList.contains("post-rating-button")) {
+            const button = event.target;
+            const post = button.closest(".post");
+            const postId = post.getAttribute("data-post-id");
+
+            if (!postId) {
+                console.error("Erro: Post sem ID!");
+                return;
+            }
+
+            const ratingContainer = button.closest(".post-rating");
+            const isUpvote = button.classList.contains("upvote");
+            const countSpan = ratingContainer.querySelector(".post-rating-count");
+
+            if (!countSpan) {
+                console.error("Erro: Contador de votos não encontrado.");
+                return;
+            }
+
+            try {
+                const response = await fetch(`/posts/${postId}/${isUpvote ? "upvote" : "downvote"}`, {
+                    method: "POST"
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    countSpan.textContent = data.newCount;
+                } else {
+                    console.error("Erro ao votar:", data);
+                }
+            } catch (error) {
+                console.error("Erro na requisição:", error);
+            }
+        }
+    });
+});
+
+
+    </script>
+
 <style>
+
+
+
+
     body {
     background-color: black;
     color: green;
@@ -68,6 +124,51 @@ a:hover {
     animation: blink 1s step-start infinite;
 }
 
+/* posts counter */
+
+.post-rating:not(.post-rating-selected) > .post-rating-button:hover {
+    color: #fff;
+
+
+}
+
+/* Estilizando o container do post */
+.post-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+}
+
+/* Contêiner para os botões de upvote e downvote */
+.post-rating-container {
+    display: flex;
+    flex-direction: column; /* Organiza os botões verticalmente */
+    align-items: center; /* Centraliza os botões */
+    margin-left: auto; /* Joga para a direita */
+}
+
+/* Estilizando os botões de upvote e downvote */
+.post-rating {
+    display: flex;
+    align-items: center;
+    gap: 5px; /* Espaço entre ícone e número */
+}
+
+.post-rating-button {
+    width: 16px;
+    height: 16px;
+    cursor: pointer;
+    filter: invert(1); /* Deixa os ícones brancos */
+    transition: transform 0.2s ease-in-out;
+}
+
+/* Efeito de hover nos botões */
+.vote:hover {
+    transform: scale(1.2);
+}
+
+
 </style>
 <body>
     <header>
@@ -84,17 +185,25 @@ a:hover {
 <article>
     <h2 class="">/artigos/</h2>
     <table class="ti">
-        <tbody>
             <tr>
                 <td class="data">25/02/2021</td>
-                <td class="post">
-                    <a href="artigos/instalando_linux_por_cima_do_windows_via_windows.html">
-                        Instalando Linux por cima do Windows via Windows.
-                    </a>
-                    <a href="https://iconscout.com/icons/up" class="text-underline font-size-sm" target="_blank">Up</a> by <a href="https://iconscout.com/contributors/bryn-taylor" class="text-underline font-size-sm" target="_blank">Bryn Taylor</a>
-                    <img src="./public/images/up.svg"/> <img src="./public/images/down.svg"/>
+                <td class="post" data-post-id="123">
+                    <div class="post-container">
+                        <a href="artigos/instalando_linux_por_cima_do_windows_via_windows.html">
+                            Instalando Linux por cima do Windows via Windows.
+                        </a>
+                        <div class="post-rating post-rating-selected">
+                            <img class="post-rating-button upvote" src="./public/images/up.svg"/>
+                            <span class="post-rating-count">0</span>
+                        </div>
+                        <div class="post-rating">
+                            <img class="post-rating-button downvote" src="./public/images/down.svg"/>
+                            <span class="post-rating-count">0</span>
+                        </div>
+                    </div>
                 </td>
-            </tr>
+                
+            </tr>   
             
             <tr>
                 <td class="data">25/02/2021</td>
@@ -104,7 +213,6 @@ a:hover {
                     </a>
                 </td>
             </tr>
-        </tbody>
     </table>
 
     <h2>/artigos/deepweb_about/</h2>
@@ -127,3 +235,4 @@ a:hover {
 </body>
 </html>
 
+<script src="./public/script/index.js"></script>

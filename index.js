@@ -78,6 +78,26 @@ app.get('/posts', (req, res) => {
 //  res.render('/posts')
 //})
 
+//post like count
+
+let posts = { "123": { upvotes: 0, downvotes: 0 } };
+
+app.post("/posts/:id/upvote", (req, res) => {
+    const { id } = req.params;
+    if (!posts[id]) posts[id] = { upvotes: 0, downvotes: 0 };
+
+    posts[id].upvotes++;
+    res.json({ success: true, newCount: posts[id].upvotes });
+});
+
+app.post("/posts/:id/downvote", (req, res) => {
+    const { id } = req.params;
+    if (!posts[id]) posts[id] = { upvotes: 0, downvotes: 0 };
+
+    posts[id].downvotes++;
+    res.json({ success: true, newCount: posts[id].downvotes });
+});
+
 //running server
 
 PORT  = process.env.PORT || 3000

@@ -281,5 +281,113 @@ section .search-button {
     cursor: pointer;
 }
 
-/**/
+/*post counter*/
+
+
+
+body {
+    background-color: black;
+    color: green;
+    font-family: monospace;
+    padding: 20px;
+}
+
+h1, h2 {
+    color: limegreen;
+}
+
+cite {
+    color: darkgreen;
+    font-style: italic;
+}
+
+/* Estilizando as tabelas para parecerem um terminal */
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 20px;
+    background-color: black;
+    border: 1px solid green;
+}
+
+td {
+    border: 1px solid green;
+    padding: 10px;
+    text-align: left;
+}
+
+a {
+    color: limegreen;
+    text-decoration: none;
+}
+
+a:hover {
+    color: white;
+    text-shadow: 0px 0px 5px green;
+}
+
+/* Estilo para as datas */
+.data {
+    font-weight: bold;
+    color: darkgreen;
+}
+
+/* Ajustando os posts */
+.post {
+    color: lightgreen;
+}
+
+/* Criando um efeito de terminal piscando */
+@keyframes blink {
+    50% { opacity: 0; }
+}
+
+.blink {
+    animation: blink 1s step-start infinite;
+}
+
+/* posts counter */
+
+.post-rating:not(.post-rating-selected) > .post-rating-button:hover {
+    color: #fff;
+
+
+}
+
+/* Estilizando o container do post */
+.post-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+}
+
+/* Contêiner para os botões de upvote e downvote */
+.post-rating-container {
+    display: flex;
+    flex-direction: column; /* Organiza os botões verticalmente */
+    align-items: center; /* Centraliza os botões */
+    margin-left: auto; /* Joga para a direita */
+}
+
+/* Estilizando os botões de upvote e downvote */
+.post-rating {
+    display: flex;
+    align-items: center;
+    gap: 5px; /* Espaço entre ícone e número */
+}
+
+.post-rating-button {
+    width: 16px;
+    height: 16px;
+    cursor: pointer;
+    filter: invert(1); /* Deixa os ícones brancos */
+    transition: transform 0.2s ease-in-out;
+}
+
+/* Efeito de hover nos botões */
+.vote:hover {
+    transform: scale(1.2);
+}
+
 
