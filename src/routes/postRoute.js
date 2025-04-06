@@ -9,6 +9,14 @@ router.get('/title', postController.redirect)
 router.get('/', postController.searchPost)
 
 
+
+//contador de likes do post
+
+router.post('/:id/upvote', postController.upvote);
+router.post('/:id/downvote', postController.downvote);
+
+//
+
 function insertPostData() {
     postModel.insertMany([
         {

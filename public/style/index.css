@@ -348,27 +348,29 @@ a:hover {
 
 
 }
-
 .post-container {
     display: flex;
     justify-content: space-between;
     align-items: center;
     width: 100%;
+    position: relative;
 }
-
 
 .post-rating-container {
     display: flex;
-    flex-direction: column;
-    align-items: center; 
-    margin-left: auto;    
+    flex-direction: column; /* Upvote e Downvote em coluna */
+    align-items: flex-end;
+    position: absolute;
+    right: 10px; /* Ajuste para alinhar à direita */
+    top: 50%;
+    transform: translateY(-50%); /* Centraliza verticalmente */
 }
-
 
 .post-rating {
     display: flex;
     align-items: center;
-    gap: 5px; 
+    justify-content: flex-end;
+    gap: 5px;
 }
 
 .post-rating-button {
@@ -377,6 +379,10 @@ a:hover {
     cursor: pointer;
     transition: transform 0.2s ease-in-out;
     filter: brightness(0) invert(1);
+}
+
+.post-rating-button:hover {
+    transform: scale(1.2);
 }
 
 .vote:hover {

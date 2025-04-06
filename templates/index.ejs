@@ -22,9 +22,7 @@
     <%-include('./views_util/nav.ejs')%>
     
     <main>
-
-        <h1 class="welcome">Boas vindas à Academia do Corona</h1>
-        <p class="text">Bom, eu sou o <a class="link" href="./about">Corona</a>.
+        <p class="text">Bom, eu sou o <a class="link" href="./about">Corona</a>
         </p>
 
         <div class="notice-box">
@@ -45,13 +43,34 @@
                     <td class="post" data-post-id="123">
                         <div class="post-container">
                             <a href="#">Instalando Linux por cima do Windows via Windows.</a>
-                            <div class="post-rating">
-                                <img class="post-rating-button upvote" src="up.svg" />
-                                <span class="post-rating-count" id="upvote-count-123">0</span>
-                            </div>
-                            <div class="post-rating">
-                                <img class="post-rating-button downvote" src="down.svg" />
-                                <span class="post-rating-count" id="downvote-count-123">0</span>
+                            <div class="ratings">      
+                                <div class="post-rating">
+                                    <img class="post-rating-button upvote" src="../public/images/up.svg" />
+                                    <span class="post-rating-count" id="upvote-count-123">0</span>
+                                </div>
+                                <div class="post-rating">
+                                    <img class="post-rating-button downvote" src="../public/images/down.svg" />
+                                    <span class="post-rating-count" id="downvote-count-123">0</span>
+                                </div>
+                            </div> 
+                        </div>
+                    </td>
+                </tr>
+
+                <tr>
+                    <td class="data">25/02/2021</td>
+                    <td class="post" data-post-id="1234">
+                        <div class="post-container">
+                            <a href="#">Como ciar </a>
+                            <div class="ratings">
+                                <div class="post-rating">
+                                    <img class="post-rating-button upvote" src="../public/images/up.svg" />
+                                    <span class="post-rating-count" id="upvote-count-123">0</span>
+                                </div>
+                                <div class="post-rating">
+                                    <img class="post-rating-button downvote" src="../public/images/down.svg" />
+                                    <span class="post-rating-count" id="downvote-count-123">0</span>
+                                </div>
                             </div>
                         </div>
                     </td>
