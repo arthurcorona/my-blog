@@ -7,7 +7,7 @@ export interface Profile {
   username: string;
   avatar_url: string | null;
   created_at: string;
-  updated_at: string;
+  role: AppRole;
 }
 
 export interface UserRole {
@@ -32,7 +32,7 @@ export interface Post {
 
 export interface PostWithAuthor extends Post {
   author: Profile;
-  tags: Tag[];
+  tags?: Tag[];
 }
 
 export interface Tag {

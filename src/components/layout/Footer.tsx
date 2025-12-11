@@ -11,7 +11,7 @@ export function Footer() {
               <Terminal className="h-4 w-4 text-primary" />
             </div>
             <span className="font-mono text-sm text-muted-foreground">
-              dev<span className="text-primary">.blog</span>
+              Rat<span className="text-primary">Hole</span>
             </span>
           </div>
 
@@ -32,7 +32,7 @@ export function Footer() {
 
           <div className="flex items-center gap-4">
             <a 
-              href="https://github.com" 
+              href="https://github.com/arthurcorona"
               target="_blank" 
               rel="noopener noreferrer"
               className="text-muted-foreground hover:text-foreground transition-colors"
@@ -40,7 +40,7 @@ export function Footer() {
               <Github className="h-5 w-5" />
             </a>
             <a 
-              href="https://twitter.com" 
+              href="https://x.com/imarthurcorona"
               target="_blank" 
               rel="noopener noreferrer"
               className="text-muted-foreground hover:text-foreground transition-colors"
@@ -52,8 +52,8 @@ export function Footer() {
 
         <div className="mt-8 pt-8 border-t border-border/40 text-center">
           <p className="text-sm text-muted-foreground">
-            © {new Date().getFullYear()} dev.blog. Feito com{' '}
-            <span className="text-primary">♥</span> para desenvolvedores.
+            © {new Date().getFullYear()} RatHole,
+            <span className="text-primary"></span> devaneios e ideias.
           </p>
         </div>
       </div>

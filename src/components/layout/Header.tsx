@@ -22,7 +22,7 @@ export function Header() {
             <Terminal className="h-5 w-5 text-primary" />
           </div>
           <span className="font-mono font-semibold text-lg">
-            dev<span className="text-primary">.blog</span>
+          Rat<span className="text-primary">Hole</span>
           </span>
         </Link>
 
