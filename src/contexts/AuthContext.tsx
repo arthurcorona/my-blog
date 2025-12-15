@@ -55,26 +55,34 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     return () => subscription.unsubscribe();
   }, []);
 
-  const fetchUserData = async (userId: string) => {
-    try {
-      const [profileResult, roleResult] = await Promise.all([
-        supabase.from('profiles').select('*').eq('id', userId).maybeSingle(),
-        supabase.from('user_roles').select('role').eq('user_id', userId).maybeSingle()
-      ]);
-
-      if (profileResult.data) {
-        setProfile(profileResult.data as Profile);
-      }
-
-      if (roleResult.data) {
-        setRole(roleResult.data.role as AppRole);
-      }
-    } catch (error) {
-      console.error('Error fetching user data:', error);
-    } finally {
-      setIsLoading(false);
+const fetchUserData = async (userId: string) => {
+  try {
+    const { data: profileData, error: profileError } = await supabase
+      .from('profiles')
+      .select('*')
+      .eq('id', userId)
+      .maybeSingle();
+    if (profileError) {
+      console.error('Error fetching profile:', profileError);
     }
-  };
+    if (profileData) {
+      const typedProfile: Profile = {
+        id: profileData.id,
+        username: (profileData as any).username,
+        avatar_url: (profileData as any).avatar_url ?? null,
+        created_at: (profileData as any).created_at,
+        role: ((profileData as any).role ?? 'reader') as AppRole,
+      };
+
+      setProfile(typedProfile);
+      setRole(typedProfile.role);
+    }
+  } catch (error) {
+    console.error('Error fetching user data:', error);
+  } finally {
+    setIsLoading(false);
+  }
+};
 
   const signUp = async (email: string, password: string, username: string) => {
     const redirectUrl = `${window.location.origin}/`;
