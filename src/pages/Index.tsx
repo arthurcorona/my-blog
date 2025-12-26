@@ -3,7 +3,7 @@ import { Layout } from '@/components/layout/Layout';
 import { PostGrid } from '@/components/posts/PostGrid';
 import { NewPostForm } from '@/components/posts/NewPostForm';
 import { supabase } from '@/integrations/supabase/client';
-import type { PostWithAuthor, Post, Profile, Tag } from '@/types/database';
+import type { PostWithAuthor, Post, Profile, Tag, AppRole } from '@/types/database';
 import { Code2, Sparkles, Plus } from 'lucide-react';
 
 const Index = () => {
@@ -12,57 +12,104 @@ const Index = () => {
   const [profile, setProfile] = useState<Profile | null>(null);
   const [isCheckingAuth, setIsCheckingAuth] = useState(true);
   const [showNewPostForm, setShowNewPostForm] = useState(false);
-
+  const isAdmin = profile?.role === 'admin';
+  
   useEffect(() => {
     const fetchData = async () => {
       try {
-        // 1. Pegar usuário atual
         const { data: authData, error: authError } = await supabase.auth.getUser();
         if (authError) throw authError;
 
-        if (authData.user) {
-          // 2. Buscar admin
-          const { data: profileData, error: profileError } = await supabase
-            .from('profiles')
-            .select('*')
-            .eq('id', authData.user.id)
-            .single();
+       if (authData.user) {
+  const { data: profileData, error: profileError } = await supabase
+    .from('profiles')
+    .select('*')
+    .eq('id', authData.user.id)
+    .single();
 
-          if (profileError) throw profileError;
-          setProfile(profileData as Profile);
-        } else {
-          setProfile(null);
-        }
+  if (profileError) throw profileError;
 
-        // 3. Buscar posts publicados
-        const { data: postsData, error: postsError } = await supabase
-          .from('posts')
+  if (profileData) {
+    const typedProfile: Profile = {
+      id: (profileData as any).id,
+      username: (profileData as any).username,
+      avatar_url: (profileData as any).avatar_url ?? null,
+      created_at: (profileData as any).created_at,
+      role: ((profileData as any).role ?? 'reader') as AppRole, // usa a coluna role real se existir, senão cai para 'reader'
+    };
+
+    setProfile(typedProfile);
+  } else {
+    setProfile(null);
+  }
+} else {
+  setProfile(null);
+}
+
+const publishPost = async (postId: string) => {
+  try {
+    const { error } = await supabase
+      .from('posts')
+      .update({ status: 'published' })
+      .eq('id', postId);
+
+    if (error) throw error;
+
+    await reloadPosts();
+  } catch (error) {
+    console.error('Erro ao publicar post:', error);
+  }
+};
+
+    // Buscar posts publicados
+    const { data: postsData, error: postsError } = await supabase
+      .from('posts')
+      .select(`
+        *,
+        author:profiles(*)
+      `)
+      .eq('status', 'published')
+      .order('created_at', { ascending: false });
+
+    if (postsError) throw postsError;
+
+    const postsWithTags: PostWithAuthor[] = await Promise.all(
+      (postsData || []).map(async (postRow: any) => {
+        const { data: postTags } = await supabase
+          .from('post_tags')
           .select(`
-            *,
-            author:profiles(*)
+            tag:tags(*)
           `)
-          .eq('status', 'published')
-          .order('created_at', { ascending: false });
+          .eq('post_id', postRow.id);
 
-        if (postsError) throw postsError;
+        const tags = (postTags || []).map((pt: any) => pt.tag as Tag);
 
-        const postsWithTags: PostWithAuthor[] = await Promise.all(
-          (postsData || []).map(async (post: Post & { author: Profile }) => {
-            const { data: postTags } = await supabase
-              .from('post_tags')
-              .select(`
-                tag:tags(*)
-              `)
-              .eq('post_id', post.id);
+        const post: PostWithAuthor = {
+          id: postRow.id,
+          title: postRow.title,
+          slug: postRow.slug,
+          content: postRow.content,
+          excerpt: postRow.excerpt,
+          cover_image: postRow.cover_image,
+          status: postRow.status,
+          author_id: postRow.author_id,
+          created_at: postRow.created_at,
+          updated_at: postRow.updated_at,
+          author: {
+            id: postRow.author.id,
+            username: postRow.author.username,
+            avatar_url: postRow.author.avatar_url,
+            created_at: postRow.author.created_at,
+            role: postRow.author.role as AppRole,
+          },
+          tags,
+        };
 
-            return {
-              ...post,
-              tags: (postTags || []).map((pt: { tag: Tag }) => pt.tag)
-            };
-          })
-        );
+        return post;
+      })
+    );
 
-        setPosts(postsWithTags);
+    setPosts(postsWithTags);
       } catch (error) {
         console.error('Error fetching data:', error);
       } finally {
@@ -74,45 +121,88 @@ const Index = () => {
     fetchData();
   }, []);
 
-  const reloadPosts = async () => {
-    setIsLoading(true);
-    try {
-      const { data: postsData, error: postsError } = await supabase
-        .from('posts')
-        .select(`
-          *,
-          author:profiles(*)
-        `)
-        .eq('status', 'published')
-        .order('created_at', { ascending: false });
+const loadPosts = async (admin: boolean) => {
+  setIsLoading(true);
+  try {
+    let query = supabase
+      .from('posts')
+      .select(`
+        *,
+        author:profiles(*)
+      `)
+      .order('created_at', { ascending: false });
 
-      if (postsError) throw postsError;
-
-      const postsWithTags: PostWithAuthor[] = await Promise.all(
-        (postsData || []).map(async (post: Post & { author: Profile }) => {
-          const { data: postTags } = await supabase
-            .from('post_tags')
-            .select(`
-              tag:tags(*)
-            `)
-            .eq('post_id', post.id);
-
-          return {
-            ...post,
-            tags: (postTags || []).map((pt: { tag: Tag }) => pt.tag)
-          };
-        })
-      );
-
-      setPosts(postsWithTags);
-    } catch (error) {
-      console.error('Error reloading posts:', error);
-    } finally {
-      setIsLoading(false);
+    if (!admin) {
+      query = query.eq('status', 'published');
     }
-  };
 
-  const isAdmin = profile?.role === 'admin';
+    const { data: postsData, error: postsError } = await query;
+
+    if (postsError) throw postsError;
+
+    const postsWithTags: PostWithAuthor[] = await Promise.all(
+      (postsData || []).map(async (postRow: any) => {
+        const { data: postTags } = await supabase
+          .from('post_tags')
+          .select(`
+            tag:tags(*)
+          `)
+          .eq('post_id', postRow.id);
+
+        const tags = (postTags || []).map((pt: any) => pt.tag as Tag);
+
+        const post: PostWithAuthor = {
+          id: postRow.id,
+          title: postRow.title,
+          slug: postRow.slug,
+          content: postRow.content,
+          excerpt: postRow.excerpt,
+          cover_image: postRow.cover_image,
+          status: postRow.status,
+          author_id: postRow.author_id,
+          created_at: postRow.created_at,
+          updated_at: postRow.updated_at,
+          author: {
+            id: postRow.author.id,
+            username: postRow.author.username,
+            avatar_url: postRow.author.avatar_url,
+            created_at: postRow.author.created_at,
+            role: postRow.author.role as AppRole,
+          },
+          tags,
+        };
+
+        return post;
+      })
+    );
+
+    setPosts(postsWithTags);
+  } catch (error) {
+    console.error('Error loading posts:', error);
+  } finally {
+    setIsLoading(false);
+  }
+};
+
+const reloadPosts = async () => {
+  const admin = profile?.role === 'admin';
+  await loadPosts(!!admin);
+};
+
+const publishPost = async (postId: string) => {
+  try {
+    const { error } = await supabase
+      .from('posts')
+      .update({ status: 'published' })
+      .eq('id', postId);
+
+    if (error) throw error;
+
+    await reloadPosts();
+  } catch (error) {
+    console.error('Erro ao publicar post:', error);
+  }
+};
 
   return (
     <Layout>
@@ -175,7 +265,12 @@ const Index = () => {
           />
         )}
 
-        <PostGrid posts={posts} isLoading={isLoading} />
+        <PostGrid
+          posts={posts}
+          isLoading={isLoading}
+          isAdmin={isAdmin}
+          onPublishPost={publishPost}
+        />
       </section>
     </Layout>
   );

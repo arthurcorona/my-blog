@@ -5,41 +5,66 @@ import { FileText } from 'lucide-react';
 interface PostGridProps {
   posts: PostWithAuthor[];
   isLoading?: boolean;
+  isAdmin?: boolean;
+  onPublishPost?: (id: string) => void; //teste;
 }
 
-export function PostGrid({ posts, isLoading }: PostGridProps) {
+export const PostGrid = ({ posts, isLoading, isAdmin, onPublishPost }: PostGridProps) => {
   if (isLoading) {
-    return (
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {[...Array(6)].map((_, i) => (
-          <div 
-            key={i}
-            className="h-80 rounded-lg bg-card/50 animate-pulse border border-border/50"
-          />
-        ))}
-      </div>
-    );
+    return <p>Carregando posts...</p>;
   }
 
   if (posts.length === 0) {
-    return (
-      <div className="flex flex-col items-center justify-center py-20 text-center">
-        <div className="p-4 rounded-full bg-muted/50 mb-4">
-          <FileText className="h-8 w-8 text-muted-foreground" />
-        </div>
-        <h3 className="text-lg font-medium mb-2">Nenhum post encontrado</h3>
-        <p className="text-muted-foreground text-sm">
-          Volte mais tarde para conferir novos conteúdos.
-        </p>
-      </div>
-    );
+    return <p className="text-muted-foreground">Nenhum post encontrado.</p>;
   }
 
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-      {posts.map((post, index) => (
-        <PostCard key={post.id} post={post} index={index} />
+    <div className="grid gap-6 md:grid-cols-2">
+      {posts.map((post) => (
+        <article key={post.id} className="rounded-lg border border-border bg-card p-4 space-y-2">
+          <div className="flex items-center justify-between">
+            <h3 className="text-lg font-semibold">{post.title}</h3>
+
+            {isAdmin && post.status === 'draft' && onPublishPost && (
+              <button
+                onClick={() => onPublishPost(post.id)}
+                className="text-xs px-2 py-1 rounded-md bg-emerald-600 text-white hover:bg-emerald-700"
+              >
+                Publicar
+              </button>
+            )}
+          </div>
+
+          {post.status === 'draft' && isAdmin && (
+            <span className="inline-flex items-center rounded-full bg-amber-100 px-2 py-0.5 text-[10px] font-medium text-amber-800">
+              RASCUNHO
+            </span>
+          )}
+
+          <p className="text-xs text-muted-foreground">
+            {new Date(post.created_at).toLocaleDateString('pt-BR')} • {post.author.username}
+          </p>
+
+          {post.excerpt && (
+            <p className="text-sm text-muted-foreground mt-1">
+              {post.excerpt}
+            </p>
+          )}
+
+          {post.tags && post.tags.length > 0 && (
+            <div className="mt-2 flex flex-wrap gap-2">
+              {post.tags.map((tag) => (
+                <span
+                  key={tag.id}
+                  className="rounded-full bg-muted px-2 py-0.5 text-xs text-muted-foreground"
+                >
+                  {tag.name}
+                </span>
+              ))}
+            </div>
+          )}
+        </article>
       ))}
     </div>
   );
-}
+};
