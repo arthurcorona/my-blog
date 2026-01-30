@@ -32,6 +32,7 @@ export function SuggestionForm({ onSuccess }: SuggestionFormProps) {
   });
 
   const onSubmit = async (data: SuggestionFormData) => {
+    // 1) Verifica se está logado
     if (!user) {
       toast.error('Faça login para enviar sugestões');
       return;
@@ -40,14 +41,18 @@ export function SuggestionForm({ onSuccess }: SuggestionFormProps) {
     setIsSubmitting(true);
 
     try {
-      const { error } = await supabase.from('suggestions').insert({
-        title: data.title,
-        description: data.description,
-        user_id: user.id
-      });
+      // 2) Insere a sugestão com user_id
+      const { error } = await supabase
+        .from('suggestions')
+        .insert({
+          title: data.title,
+          description: data.description,
+          user_id: user.id, // <-- OBRIGATÓRIO para passar na policy
+        });
 
       if (error) throw error;
 
+      // 3) Sucesso
       toast.success('Sugestão enviada com sucesso!');
       reset();
       onSuccess?.();
@@ -59,6 +64,7 @@ export function SuggestionForm({ onSuccess }: SuggestionFormProps) {
     }
   };
 
+  // Se não estiver logado, não renderiza o form
   if (!user) {
     return null;
   }

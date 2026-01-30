@@ -13,7 +13,7 @@ interface PostCardProps {
 
 export function PostCard({ post, index = 0 }: PostCardProps) {
   return (
-    <Link to={`/post/${post.slug}`}>
+    <Link to={`/posts/${post.slug}`}>
       <Card 
         className="h-full card-hover bg-card/50 backdrop-blur-sm animate-slide-up group"
         style={{ animationDelay: `${index * 100}ms` }}
