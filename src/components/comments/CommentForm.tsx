@@ -2,14 +2,14 @@ import { useState } from 'react';
 import { z } from 'zod';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { Send, User } from 'lucide-react';
+import { User as UserIcon, Send } from "lucide-react"; // Adicionei o Send
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { useAuth } from '@/contexts/AuthContext';
-import { supabase } from '@/integrations/supabase/client';
-import { toast } from 'sonner';
+import { api } from "@/lib/api"; // Importando nossa API
+import { toast } from '@/hooks/use-toast'; // Ajuste o import do toast se necessário
 
 const commentSchema = z.object({
   content: z.string().min(3, 'Comentário muito curto').max(1000, 'Comentário muito longo'),
@@ -26,7 +26,8 @@ interface CommentFormProps {
 }
 
 export function CommentForm({ postId, parentId, onSuccess, onCancel }: CommentFormProps) {
-  const { user, profile } = useAuth();
+  // CORREÇÃO 1: Removemos 'profile'. Tudo que precisamos está em 'user'.
+  const { user } = useAuth(); 
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const { register, handleSubmit, reset, formState: { errors } } = useForm<CommentFormData>({
@@ -37,29 +38,28 @@ export function CommentForm({ postId, parentId, onSuccess, onCancel }: CommentFo
     setIsSubmitting(true);
 
     try {
-      const commentData = {
+      // O backend pega o user_id automaticamente pelo token se estiver logado
+      await api.post('/comments', {
         post_id: postId,
         content: data.content,
-        user_id: user?.id || null,
-        guest_name: user ? null : data.guest_name || 'Anônimo',
+        guest_name: user ? undefined : (data.guest_name || 'Anônimo'),
         parent_id: parentId || null
-      };
+      });
 
-      const { error } = await supabase.from('comments').insert(commentData);
-
-      if (error) throw error;
-
-      toast.success(
-        user 
-          ? 'Comentário publicado!' 
-          : 'Comentário enviado para moderação'
-      );
+      toast({
+        title: user ? 'Comentário publicado!' : 'Comentário enviado!',
+        description: user ? undefined : 'Seu comentário pode passar por moderação.'
+      });
       
       reset();
       onSuccess?.();
     } catch (error) {
       console.error('Error submitting comment:', error);
-      toast.error('Erro ao enviar comentário');
+      toast({
+        variant: "destructive",
+        title: "Erro",
+        description: "Não foi possível enviar o comentário."
+      });
     } finally {
       setIsSubmitting(false);
     }
@@ -70,7 +70,7 @@ export function CommentForm({ postId, parentId, onSuccess, onCancel }: CommentFo
       {!user && (
         <div className="space-y-2">
           <Label htmlFor="guest_name" className="flex items-center gap-2 text-sm">
-            <User className="h-4 w-4" />
+            <UserIcon className="h-4 w-4" />
             Seu nome (opcional)
           </Label>
           <Input
@@ -84,7 +84,7 @@ export function CommentForm({ postId, parentId, onSuccess, onCancel }: CommentFo
 
       <div className="space-y-2">
         <Textarea
-          placeholder={user ? 'Escreva seu comentário...' : 'Escreva seu comentário (será moderado antes de aparecer)...'}
+          placeholder={user ? 'Escreva seu comentário...' : 'Escreva seu comentário...'}
           className="min-h-24 bg-secondary/50 resize-none"
           {...register('content')}
         />
@@ -96,7 +96,7 @@ export function CommentForm({ postId, parentId, onSuccess, onCancel }: CommentFo
       <div className="flex items-center justify-between">
         {user && (
           <p className="text-xs text-muted-foreground">
-            Comentando como <span className="text-primary font-medium">{profile?.username}</span>
+            Comentando como <span className="text-primary font-medium">{user.name}</span>
           </p>
         )}
         

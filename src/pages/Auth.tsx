@@ -3,13 +3,15 @@ import { useNavigate } from 'react-router-dom';
 import { z } from 'zod';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { Terminal, Mail, Lock, User, ArrowRight } from 'lucide-react';
+// CORREÇÃO 1: Adicionei Terminal e ArrowRight
+import { User as UserIcon, Mail, Lock, Terminal, ArrowRight } from "lucide-react";
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useAuth } from '@/contexts/AuthContext';
+import { api } from "@/lib/api"; // Importar API para o Signup
 import { toast } from 'sonner';
 
 const loginSchema = z.object({
@@ -28,7 +30,7 @@ type SignupFormData = z.infer<typeof signupSchema>;
 
 const Auth = () => {
   const navigate = useNavigate();
-  const { user, signIn, signUp } = useAuth();
+  const { user, signIn } = useAuth();
   const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
@@ -47,39 +49,52 @@ const Auth = () => {
 
   const handleLogin = async (data: LoginFormData) => {
     setIsLoading(true);
-    const { error } = await signIn(data.email, data.password);
-    
-    if (error) {
-      toast.error(error.message === 'Invalid login credentials' 
-        ? 'Email ou senha incorretos' 
-        : error.message
-      );
-    } else {
+    try {
+      // CORREÇÃO 3: Usando try/catch em vez de const { error }
+      await signIn(data.email, data.password);
       toast.success('Login realizado com sucesso!');
       navigate('/');
+    } catch (error: any) {
+      console.error(error);
+      const msg = error.response?.data?.message || 'Erro ao fazer login';
+      toast.error(msg === 'Invalid password' ? 'Senha incorreta' : msg);
+    } finally {
+      setIsLoading(false);
     }
-    setIsLoading(false);
   };
 
   const handleSignup = async (data: SignupFormData) => {
     setIsLoading(true);
-    const { error } = await signUp(data.email, data.password, data.username);
-    
-    if (error) {
-      if (error.message.includes('already registered')) {
-        toast.error('Este email já está cadastrado');
-      } else {
-        toast.error(error.message);
-      }
-    } else {
-      toast.success('Conta criada com sucesso!');
+    try {
+      // CORREÇÃO 4: Chamada direta para a API
+      await api.post('/auth/signup', {
+        username: data.username,
+        email: data.email,
+        password: data.password
+      });
+
+      toast.success('Conta criada! Entrando...');
+      
+      // Auto-login após criar conta
+      await signIn(data.email, data.password);
       navigate('/');
+
+    } catch (error: any) {
+      console.error(error);
+      const msg = error.response?.data?.message || 'Erro ao criar conta';
+      if (msg.includes('exists')) {
+        toast.error('Este email ou usuário já está em uso.');
+      } else {
+        toast.error('Falha no cadastro. Tente novamente.');
+      }
+    } finally {
+      setIsLoading(false);
     }
-    setIsLoading(false);
   };
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-background p-4">
+      {/* Background Effects */}
       <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-transparent to-transparent" />
       <div className="absolute top-20 -left-20 w-72 h-72 bg-primary/10 rounded-full blur-3xl" />
       <div className="absolute bottom-10 right-10 w-96 h-96 bg-primary/5 rounded-full blur-3xl" />
@@ -91,7 +106,7 @@ const Auth = () => {
           </div>
           <div>
             <CardTitle className="text-2xl font-bold">
-              dev<span className="text-primary">.blog</span>
+              rathole<span className="text-primary">.dev</span>
             </CardTitle>
             <CardDescription className="mt-2">
               Acesse sua conta ou crie uma nova
@@ -165,7 +180,7 @@ const Auth = () => {
               <CardContent className="space-y-4">
                 <div className="space-y-2">
                   <Label htmlFor="signup-username" className="flex items-center gap-2">
-                    <User className="h-4 w-4 text-muted-foreground" />
+                    <UserIcon className="h-4 w-4 text-muted-foreground" />
                     Username
                   </Label>
                   <Input

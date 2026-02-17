@@ -3,53 +3,28 @@ import { Layout } from '@/components/layout/Layout';
 import { SuggestionCard } from '@/components/suggestions/SuggestionCard';
 import { SuggestionForm } from '@/components/suggestions/SuggestionForm';
 import { useAuth } from '@/contexts/AuthContext';
-import { supabase } from '@/integrations/supabase/client';
-import type { SuggestionWithAuthor, Suggestion, Profile } from '@/types/database';
+import { Suggestion } from "@/types"; // Usando o tipo global
+import { api } from "@/lib/api"; // Axios
 import { Lightbulb, LogIn, TrendingUp } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Link } from 'react-router-dom';
 
+// Estendendo o tipo para incluir o campo que o Front/Back controlam
+interface SuggestionWithVoted extends Suggestion {
+  has_voted?: boolean;
+}
+
 const Suggestions = () => {
   const { user } = useAuth();
-  const [suggestions, setSuggestions] = useState<SuggestionWithAuthor[]>([]);
+  const [suggestions, setSuggestions] = useState<SuggestionWithVoted[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
   const fetchSuggestions = async () => {
     try {
-      const { data, error } = await supabase
-        .from('suggestions')
-        .select('*')
-        .order('upvotes_count', { ascending: false });
-
-      if (error) throw error;
-
-      // Fetch profiles separately
-      const userIds = [...new Set((data || []).map(s => s.user_id))];
-      const { data: profiles } = await supabase.from('profiles').select('*').in('id', userIds);
-      const profilesMap = new Map((profiles || []).map((p: Profile) => [p.id, p]));
-
-      // Check if current user has voted on each suggestion
-      let suggestionsWithVotes: SuggestionWithAuthor[] = (data || []).map((s) => ({
-        ...s,
-        author: profilesMap.get(s.user_id) as Profile,
-        has_voted: false
-      }));
-
-      if (user) {
-        const { data: votes } = await supabase
-          .from('suggestion_votes')
-          .select('suggestion_id')
-          .eq('user_id', user.id);
-
-        const votedIds = new Set((votes || []).map((v: { suggestion_id: string }) => v.suggestion_id));
-        
-        suggestionsWithVotes = suggestionsWithVotes.map((s) => ({
-          ...s,
-          has_voted: votedIds.has(s.id)
-        }));
-      }
-
-      setSuggestions(suggestionsWithVotes);
+      // A MÁGICA: Uma única requisição substitui aquelas 3 do Supabase
+      // O Backend já entrega ordenado e com os dados do usuário
+      const response = await api.get<SuggestionWithVoted[]>('/suggestions');
+      setSuggestions(response.data);
     } catch (error) {
       console.error('Error fetching suggestions:', error);
     } finally {
@@ -59,11 +34,11 @@ const Suggestions = () => {
 
   useEffect(() => {
     fetchSuggestions();
-  }, [user]);
+  }, [user]); // Recarrega se o usuário logar/deslogar
 
   return (
     <Layout>
-      {/* Hero */}
+      {/* Hero Section */}
       <section className="relative overflow-hidden border-b border-border/40">
         <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-transparent to-transparent" />
         
@@ -88,7 +63,7 @@ const Suggestions = () => {
 
       <section className="container py-12">
         <div className="grid lg:grid-cols-3 gap-8">
-          {/* Suggestion Form / Login CTA */}
+          {/* Coluna da Esquerda: Formulário ou Login */}
           <div className="lg:col-span-1 order-2 lg:order-1">
             {user ? (
               <div className="sticky top-24">
@@ -108,7 +83,7 @@ const Suggestions = () => {
             )}
           </div>
 
-          {/* Suggestions List */}
+          {/* Coluna da Direita: Lista de Sugestões */}
           <div className="lg:col-span-2 order-1 lg:order-2 space-y-6">
             <div className="flex items-center gap-2 text-muted-foreground">
               <TrendingUp className="h-4 w-4" />

@@ -1,10 +1,10 @@
 import { Link } from "react-router-dom";
 import { PostCard } from './PostCard';
-import type { PostWithAuthor } from '@/types/database';
+import { Post, User, Tag } from "@/types";
 import { FileText } from 'lucide-react';
 
 interface PostGridProps {
-  posts: PostWithAuthor[];
+  posts: Post[];
   isLoading?: boolean;
   isAdmin?: boolean;
   onPublishPost?: (id: string) => void; //teste function;

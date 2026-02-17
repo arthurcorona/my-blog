@@ -4,20 +4,27 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardFooter, CardHeader } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { useAuth } from '@/contexts/AuthContext';
-import { supabase } from '@/integrations/supabase/client';
+import { api } from "@/lib/api";
+import { Suggestion } from "@/types";
 import { toast } from 'sonner';
-import type { SuggestionWithAuthor } from '@/types/database';
 import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 
+// O backend precisa mandar esse 'has_voted' calculado na query
+interface SuggestionWithVoted extends Suggestion {
+  has_voted?: boolean;
+}
+
 interface SuggestionCardProps {
-  suggestion: SuggestionWithAuthor;
+  suggestion: SuggestionWithVoted;
   onVoteChange?: () => void;
 }
 
 export function SuggestionCard({ suggestion, onVoteChange }: SuggestionCardProps) {
   const { user } = useAuth();
   const [isVoting, setIsVoting] = useState(false);
+  
+  // Estado local para refletir a UI instantaneamente
   const [hasVoted, setHasVoted] = useState(suggestion.has_voted || false);
   const [votesCount, setVotesCount] = useState(suggestion.upvotes_count);
 
@@ -31,36 +38,26 @@ export function SuggestionCard({ suggestion, onVoteChange }: SuggestionCardProps
 
     try {
       if (hasVoted) {
-        const { error } = await supabase
-          .from('suggestion_votes')
-          .delete()
-          .eq('suggestion_id', suggestion.id)
-          .eq('user_id', user.id);
-
-        if (error) throw error;
-
+        await api.delete(`/suggestions/${suggestion.id}/vote`);
+        
         setHasVoted(false);
-        setVotesCount((prev) => prev - 1);
+        setVotesCount((prev) => Math.max(0, prev - 1));
         toast.success('Voto removido');
       } else {
-        const { error } = await supabase
-          .from('suggestion_votes')
-          .insert({
-            suggestion_id: suggestion.id,
-            user_id: user.id
-          });
-
-        if (error) throw error;
-
+        await api.post(`/suggestions/${suggestion.id}/vote`);
+        
         setHasVoted(true);
         setVotesCount((prev) => prev + 1);
         toast.success('Voto registrado!');
       }
 
-      onVoteChange?.();
+      onVoteChange?.(); // da um reload quando retorna erro
     } catch (error) {
       console.error('Error voting:', error);
       toast.error('Erro ao processar voto');
+      
+      setHasVoted(!hasVoted);
+      setVotesCount((prev) => hasVoted ? prev + 1 : prev - 1);
     } finally {
       setIsVoting(false);
     }
@@ -89,11 +86,11 @@ export function SuggestionCard({ suggestion, onVoteChange }: SuggestionCardProps
           <Button
             variant={hasVoted ? 'default' : 'outline'}
             size="sm"
-            className="flex-col h-auto py-2 px-3 gap-0.5 min-w-14"
+            className="flex-col h-auto py-2 px-3 gap-0.5 min-w-14 transition-all"
             onClick={handleVote}
             disabled={isVoting}
           >
-            <ArrowUp className={`h-4 w-4 ${hasVoted ? '' : 'text-muted-foreground'}`} />
+            <ArrowUp className={`h-4 w-4 ${hasVoted ? 'animate-bounce' : 'text-muted-foreground'}`} />
             <span className="text-sm font-bold">{votesCount}</span>
           </Button>
         </div>
@@ -107,7 +104,7 @@ export function SuggestionCard({ suggestion, onVoteChange }: SuggestionCardProps
 
       <CardFooter className="pt-0 text-xs text-muted-foreground">
         <div className="flex items-center gap-4">
-          <span>Por @{suggestion.author.username}</span>
+          <span>Por @{suggestion.user?.username || 'Anônimo'}</span>
           <span>
             {format(new Date(suggestion.created_at), "d 'de' MMM", { locale: ptBR })}
           </span>

@@ -1,144 +1,72 @@
-import { createContext, useContext, useEffect, useState, ReactNode } from 'react';
-import { User, Session } from '@supabase/supabase-js';
-import { supabase } from '@/integrations/supabase/client';
-import type { Profile, AppRole } from '@/types/database';
+import { createContext, useContext, useEffect, useState } from "react";
+import { api } from "@/lib/api";
+
+interface User {
+  id: string;
+  name: string;
+  role: 'admin' | 'reader';
+  avatar_url?: string;
+}
 
 interface AuthContextType {
   user: User | null;
-  session: Session | null;
-  profile: Profile | null;
-  role: AppRole | null;
-  isLoading: boolean;
+  signIn: (email: string, password: string) => Promise<void>;
+  signOut: () => void;
+  loading: boolean;
   isAdmin: boolean;
-  signUp: (email: string, password: string, username: string) => Promise<{ error: Error | null }>;
-  signIn: (email: string, password: string) => Promise<{ error: Error | null }>;
-  signOut: () => Promise<void>;
 }
 
-const AuthContext = createContext<AuthContextType | undefined>(undefined);
+const AuthContext = createContext<AuthContextType>({} as AuthContextType);
 
-export function AuthProvider({ children }: { children: ReactNode }) {
+export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
-  const [session, setSession] = useState<Session | null>(null);
-  const [profile, setProfile] = useState<Profile | null>(null);
-  const [role, setRole] = useState<AppRole | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      (event, session) => {
-        setSession(session);
-        setUser(session?.user ?? null);
+    // Ao carregar a página, verifica se já tem token salvo
+    const storedToken = localStorage.getItem('rathole_token');
+    const storedUser = localStorage.getItem('rathole_user');
 
-        if (session?.user) {
-          setTimeout(() => {
-            fetchUserData(session.user.id);
-          }, 0);
-        } else {
-          setProfile(null);
-          setRole(null);
-          setIsLoading(false);
-        }
-      }
-    );
-
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      setSession(session);
-      setUser(session?.user ?? null);
-      if (session?.user) {
-        fetchUserData(session.user.id);
-      } else {
-        setIsLoading(false);
-      }
-    });
-
-    return () => subscription.unsubscribe();
+    if (storedToken && storedUser) {
+      setUser(JSON.parse(storedUser));
+    }
+    setLoading(false);
   }, []);
 
-const fetchUserData = async (userId: string) => {
-  try {
-    const { data: profileData, error: profileError } = await supabase
-      .from('profiles')
-      .select('*')
-      .eq('id', userId)
-      .maybeSingle();
-    if (profileError) {
-      console.error('Error fetching profile:', profileError);
-    }
-    if (profileData) {
-      const typedProfile: Profile = {
-        id: profileData.id,
-        username: (profileData as any).username,
-        avatar_url: (profileData as any).avatar_url ?? null,
-        created_at: (profileData as any).created_at,
-        role: ((profileData as any).role ?? 'reader') as AppRole,
-      };
+  async function signIn(email: string, password: string) {
+    try {
+      // Bate na SUA API agora, não mais no Supabase
+      const response = await api.post('/auth/login', { email, password });
+      
+      const { token, user } = response.data;
 
-      setProfile(typedProfile);
-      setRole(typedProfile.role);
+      localStorage.setItem('rathole_token', token);
+      localStorage.setItem('rathole_user', JSON.stringify(user));
+      
+      setUser(user);
+    } catch (error) {
+      console.error("Erro ao logar:", error);
+      throw error;
     }
-  } catch (error) {
-    console.error('Error fetching user data:', error);
-  } finally {
-    setIsLoading(false);
   }
-};
 
-  const signUp = async (email: string, password: string, username: string) => {
-    const redirectUrl = `${window.location.origin}/`;
-    
-    const { error } = await supabase.auth.signUp({
-      email,
-      password,
-      options: {
-        emailRedirectTo: redirectUrl,
-        data: { username }
-      }
-    });
-
-    return { error: error as Error | null };
-  };
-
-  const signIn = async (email: string, password: string) => {
-    const { error } = await supabase.auth.signInWithPassword({
-      email,
-      password
-    });
-
-    return { error: error as Error | null };
-  };
-
-  const signOut = async () => {
-    await supabase.auth.signOut();
+  function signOut() {
+    localStorage.removeItem('rathole_token');
+    localStorage.removeItem('rathole_user');
     setUser(null);
-    setSession(null);
-    setProfile(null);
-    setRole(null);
-  };
+  }
 
   return (
-    <AuthContext.Provider
-      value={{
-        user,
-        session,
-        profile,
-        role,
-        isLoading,
-        isAdmin: role === 'admin',
-        signUp,
-        signIn,
-        signOut
-      }}
-    >
+    <AuthContext.Provider value={{ 
+      user, 
+      signIn, 
+      signOut, 
+      loading, 
+      isAdmin: user?.role === 'admin' 
+    }}>
       {children}
     </AuthContext.Provider>
   );
 }
 
-export function useAuth() {
-  const context = useContext(AuthContext);
-  if (context === undefined) {
-    throw new Error('useAuth must be used within an AuthProvider');
-  }
-  return context;
-}
+export const useAuth = () => useContext(AuthContext);

@@ -1,11 +1,16 @@
 import { useState } from 'react';
-import { Reply, User } from 'lucide-react';
+import { User as UserIcon, Mail, Lock, Reply } from "lucide-react";
 import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { CommentForm } from './CommentForm';
-import type { CommentWithAuthor } from '@/types/database';
+import { Post, User, Tag, Comment } from "@/types";
 import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
+
+// Definindo o tipo recursivo (Comentário que tem lista de Comentários dentro)
+interface CommentWithAuthor extends Comment {
+  replies?: CommentWithAuthor[];
+}
 
 interface CommentItemProps {
   comment: CommentWithAuthor;
@@ -16,7 +21,10 @@ interface CommentItemProps {
 
 export function CommentItem({ comment, postId, onReplyAdded, depth = 0 }: CommentItemProps) {
   const [showReplyForm, setShowReplyForm] = useState(false);
-  const displayName = comment.author?.username || comment.guest_name || 'Anônimo';
+  
+  const displayName = comment.user?.username || comment.guest_name || 'Anônimo';
+  const avatarUrl = comment.user?.avatar_url;
+  
   const isNested = depth > 0;
 
   const handleReplySuccess = () => {
@@ -28,7 +36,7 @@ export function CommentItem({ comment, postId, onReplyAdded, depth = 0 }: Commen
     <div className={`${isNested ? 'ml-8 pl-4 border-l-2 border-border/50' : ''}`}>
       <div className="flex gap-3 py-4">
         <Avatar className="h-8 w-8 shrink-0">
-          <AvatarImage src={comment.author?.avatar_url || ''} />
+          <AvatarImage src={avatarUrl || ''} />
           <AvatarFallback className="bg-primary/10 text-primary text-xs font-mono">
             {displayName.slice(0, 2).toUpperCase()}
           </AvatarFallback>
@@ -37,12 +45,15 @@ export function CommentItem({ comment, postId, onReplyAdded, depth = 0 }: Commen
         <div className="flex-1 space-y-2">
           <div className="flex items-center gap-2">
             <span className="font-medium text-sm">{displayName}</span>
-            {comment.author && (
+            
+            {/* Verifica se tem user (logado) */}
+            {comment.user && (
               <span className="text-xs text-primary bg-primary/10 px-1.5 py-0.5 rounded">
-                <User className="h-3 w-3 inline mr-0.5" />
+                <UserIcon className="h-3 w-3 inline mr-0.5" />
                 Usuário
               </span>
             )}
+            
             <span className="text-xs text-muted-foreground">
               {format(new Date(comment.created_at), "d MMM 'às' HH:mm", { locale: ptBR })}
             </span>
@@ -77,6 +88,7 @@ export function CommentItem({ comment, postId, onReplyAdded, depth = 0 }: Commen
         </div>
       </div>
 
+      {/* render*/}
       {comment.replies && comment.replies.length > 0 && (
         <div className="space-y-0">
           {comment.replies.map((reply) => (

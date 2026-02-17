@@ -9,7 +9,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { useAuth } from '@/contexts/AuthContext';
-import { supabase } from '@/integrations/supabase/client';
+import { api } from "@/lib/api"; // <--- Importando a API
 import { toast } from 'sonner';
 
 const suggestionSchema = z.object({
@@ -41,16 +41,12 @@ export function SuggestionForm({ onSuccess }: SuggestionFormProps) {
     setIsSubmitting(true);
 
     try {
-      // 2) Insere a sugestão com user_id
-      const { error } = await supabase
-        .from('suggestions')
-        .insert({
-          title: data.title,
-          description: data.description,
-          user_id: user.id, // <-- OBRIGATÓRIO para passar na policy
-        });
-
-      if (error) throw error;
+      // 2) Envia para a API (Substituindo Supabase)
+      // Não precisamos mandar user_id no corpo, o Backend pega do Token!
+      await api.post('/suggestions', {
+        title: data.title,
+        description: data.description,
+      });
 
       // 3) Sucesso
       toast.success('Sugestão enviada com sucesso!');

@@ -1,9 +1,14 @@
 import { useEffect, useState } from 'react';
-import { MessageSquare } from 'lucide-react';
+import { MessageSquare, Loader2 } from 'lucide-react';
 import { CommentForm } from './CommentForm';
-import { CommentItem } from './CommentItem';
-import { supabase } from '@/integrations/supabase/client';
-import type { CommentWithAuthor, Profile } from '@/types/database';
+import { CommentItem } from './CommentItem'; // Certifique-se que o CommentItem aceita o tipo abaixo
+import { api } from "@/lib/api"; 
+import { Comment } from "@/types";
+
+
+export interface CommentWithAuthor extends Comment {
+  replies?: CommentWithAuthor[];
+}
 
 interface CommentSectionProps {
   postId: string;
@@ -15,48 +20,34 @@ export function CommentSection({ postId }: CommentSectionProps) {
 
   const fetchComments = async () => {
     try {
-      const { data, error } = await supabase
-        .from('comments')
-        .select('*')
-        .eq('post_id', postId)
-        .eq('is_approved', true)
-        .order('created_at', { ascending: true });
+      // O backend deve retornar: Comment[] (já com o objeto 'user' preenchido)
+      const response = await api.get<Comment[]>(`/posts/${postId}/comments`);
+      const rawComments = response.data;
 
-      if (error) throw error;
-
-      // Fetch profiles separately for comments with user_id
-      const userIds = [...new Set((data || []).filter(c => c.user_id).map(c => c.user_id))];
-      const { data: profiles } = userIds.length > 0 
-        ? await supabase.from('profiles').select('*').in('id', userIds)
-        : { data: [] };
-
-      const profilesMap = new Map((profiles || []).map((p: Profile) => [p.id, p]));
-
-      // Organize comments into threads
+      // Threads
       const commentsMap = new Map<string, CommentWithAuthor>();
       const rootComments: CommentWithAuthor[] = [];
 
-      (data || []).forEach((comment) => {
-        const commentWithReplies: CommentWithAuthor = {
-          ...comment,
-          author: comment.user_id ? profilesMap.get(comment.user_id) || null : null,
-          replies: []
-        };
-        commentsMap.set(comment.id, commentWithReplies);
+      // mapear o commentWithAuthor
+      rawComments.forEach((c) => {
+        commentsMap.set(c.id, { ...c, replies: [] });
       });
 
+      // associar
       commentsMap.forEach((comment) => {
         if (comment.parent_id) {
           const parent = commentsMap.get(comment.parent_id);
           if (parent) {
-            parent.replies = parent.replies || [];
-            parent.replies.push(comment);
+            parent.replies?.push(comment);
           }
         } else {
+          // se não tem pai, é um comentário raiz
           rootComments.push(comment);
         }
       });
 
+      // Ordenar: Mais antigos primeiro (comportamento padrão de fórum) ou novos primeiro
+      
       setComments(rootComments);
     } catch (error) {
       console.error('Error fetching comments:', error);
@@ -69,9 +60,13 @@ export function CommentSection({ postId }: CommentSectionProps) {
     fetchComments();
   }, [postId]);
 
-  const totalComments = comments.reduce((acc, comment) => {
-    return acc + 1 + (comment.replies?.length || 0);
-  }, 0);
+  const countTotalComments = (list: CommentWithAuthor[]): number => {
+    return list.reduce((acc, comment) => {
+      return acc + 1 + (comment.replies ? countTotalComments(comment.replies) : 0);
+    }, 0);
+  };
+  
+  const totalComments = countTotalComments(comments);
 
   return (
     <section className="space-y-6">
@@ -92,16 +87,8 @@ export function CommentSection({ postId }: CommentSectionProps) {
       </div>
 
       {isLoading ? (
-        <div className="space-y-4">
-          {[...Array(3)].map((_, i) => (
-            <div key={i} className="flex gap-3 animate-pulse">
-              <div className="h-8 w-8 rounded-full bg-muted" />
-              <div className="flex-1 space-y-2">
-                <div className="h-4 w-24 bg-muted rounded" />
-                <div className="h-16 bg-muted rounded" />
-              </div>
-            </div>
-          ))}
+        <div className="flex justify-center py-8">
+          <Loader2 className="h-8 w-8 animate-spin text-primary/50" />
         </div>
       ) : comments.length === 0 ? (
         <div className="text-center py-8 text-muted-foreground">
