@@ -30,11 +30,11 @@ type SignupFormData = z.infer<typeof signupSchema>;
 
 const Auth = () => {
   const navigate = useNavigate();
-  const { user, signIn } = useAuth();
+  const { user, signIn, loading } = useAuth();
   const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
-    if (user) {
+    if (!loading && user) {
       navigate('/');
     }
   }, [user, navigate]);
@@ -66,7 +66,6 @@ const Auth = () => {
   const handleSignup = async (data: SignupFormData) => {
     setIsLoading(true);
     try {
-      // CORREÇÃO 4: Chamada direta para a API
       await api.post('/auth/signup', {
         username: data.username,
         email: data.email,
@@ -75,7 +74,6 @@ const Auth = () => {
 
       toast.success('Conta criada! Entrando...');
       
-      // Auto-login após criar conta
       await signIn(data.email, data.password);
       navigate('/');
 

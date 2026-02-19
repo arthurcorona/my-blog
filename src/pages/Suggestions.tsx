@@ -3,8 +3,8 @@ import { Layout } from '@/components/layout/Layout';
 import { SuggestionCard } from '@/components/suggestions/SuggestionCard';
 import { SuggestionForm } from '@/components/suggestions/SuggestionForm';
 import { useAuth } from '@/contexts/AuthContext';
-import { Suggestion } from "@/types"; // Usando o tipo global
-import { api } from "@/lib/api"; // Axios
+import { Suggestion } from "@/types";
+import { api } from "@/lib/api";
 import { Lightbulb, LogIn, TrendingUp } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Link } from 'react-router-dom';
@@ -77,7 +77,7 @@ const Suggestions = () => {
                   Envie sugestões e vote nos temas que você quer ver no blog.
                 </p>
                 <Button asChild className="w-full">
-                  <Link to="/auth">Entrar</Link>
+                  <Link to="/login">Entrar</Link>
                 </Button>
               </div>
             )}

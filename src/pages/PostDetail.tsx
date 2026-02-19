@@ -4,17 +4,16 @@ import { Layout } from '@/components/layout/Layout';
 import { CommentSection } from '@/components/comments/CommentSection';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { supabase } from '@/integrations/supabase/client';
-import type { PostWithAuthor, Post, Profile, Tag } from '@/types/database';
+import { Post } from "@/types"; // Usando o tipo oficial
 import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
-import { ArrowLeft, Calendar, User, Clock, Tag as TagIcon } from 'lucide-react';
+import { User as UserIcon, Calendar, Clock, ArrowLeft, Tag as TagIcon } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { api } from "@/lib/api"; // <--- Nossa API Axios (substitui o supabase)
 
 const PostDetail = () => {
   const { slug } = useParams<{ slug: string }>();
-  const [post, setPost] = useState<PostWithAuthor | null>(null);
-  const [relatedTags, setRelatedTags] = useState<Tag[]>([]);
+  const [post, setPost] = useState<Post | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
@@ -22,44 +21,9 @@ const PostDetail = () => {
       if (!slug) return;
 
       try {
-        const { data: postData, error: postError } = await supabase
-          .from('posts')
-          .select(`
-            *,
-            author:profiles(*)
-          `)
-          .eq('slug', slug)
-          .eq('status', 'published')
-          .maybeSingle();
-
-        if (postError) throw postError;
-        if (!postData) {
-          setIsLoading(false);
-          return;
-        }
-
-        // Fetch tags
-        const { data: postTags } = await supabase
-          .from('post_tags')
-          .select(`
-            tag:tags(*)
-          `)
-          .eq('post_id', postData.id);
-
-        const tags = (postTags || []).map((pt: { tag: Tag }) => pt.tag);
-
-        setPost({
-          ...(postData as Post & { author: Profile }),
-          tags
-        });
-
-        // Fetch all tags for "related tags" section
-        const { data: allTags } = await supabase
-          .from('tags')
-          .select('*')
-          .limit(10);
-
-        setRelatedTags(allTags || []);
+        // O Backend agora retorna tudo pronto: Post + Author + Tags
+        const response = await api.get<Post>(`/posts/${slug}`);
+        setPost(response.data);
       } catch (error) {
         console.error('Error fetching post:', error);
       } finally {
@@ -100,6 +64,7 @@ const PostDetail = () => {
     );
   }
 
+  // Cálculo simples de tempo de leitura
   const readingTime = Math.ceil(post.content.split(' ').length / 200);
 
   return (
@@ -116,10 +81,12 @@ const PostDetail = () => {
 
         {/* Header */}
         <header className="space-y-6 mb-12 animate-fade-in">
-          {post.tags.length > 0 && (
+          {/* Renderiza as Tags vindas do Backend */}
+          {post.tags && post.tags.length > 0 && (
             <div className="flex flex-wrap gap-2">
               {post.tags.map((tag) => (
-                <Badge key={tag.id} className="tag-badge">
+                <Badge key={tag.id} className="tag-badge bg-primary/10 text-primary hover:bg-primary/20 border-0">
+                  <TagIcon className="w-3 h-3 mr-1" />
                   {tag.name}
                 </Badge>
               ))}
@@ -165,7 +132,7 @@ const PostDetail = () => {
 
         {/* Cover image */}
         {post.cover_image && (
-          <div className="relative rounded-xl overflow-hidden mb-12 animate-slide-up">
+          <div className="relative rounded-xl overflow-hidden mb-12 animate-slide-up shadow-lg">
             <img 
               src={post.cover_image} 
               alt={post.title}
@@ -174,39 +141,12 @@ const PostDetail = () => {
           </div>
         )}
 
-        {/* Content */}
-        <div className="prose-content text-lg leading-relaxed mb-16 animate-fade-in">
-          {post.content.split('\n').map((paragraph, index) => (
-            paragraph.trim() && (
-              <p key={index} className="mb-4 text-foreground/80">
-                {paragraph}
-              </p>
-            )
-          ))}
+        {/* Content - Renderização simples de texto/markdown */}
+        <div className="prose-content text-lg leading-relaxed mb-16 animate-fade-in text-foreground/90 whitespace-pre-wrap">
+          {post.content}
         </div>
 
-        {/* Related Tags */}
-        {relatedTags.length > 0 && (
-          <section className="py-8 border-t border-border/50 mb-12">
-            <div className="flex items-center gap-2 mb-4">
-              <TagIcon className="h-4 w-4 text-primary" />
-              <h3 className="font-medium">Tags Relacionadas</h3>
-            </div>
-            <div className="flex flex-wrap gap-2">
-              {relatedTags.map((tag) => (
-                <Badge 
-                  key={tag.id} 
-                  variant="secondary"
-                  className="cursor-pointer hover:bg-primary/20 transition-colors"
-                >
-                  {tag.name}
-                </Badge>
-              ))}
-            </div>
-          </section>
-        )}
-
-        {/* Comments */}
+        {/* Comments Section */}
         <div className="border-t border-border/50 pt-12">
           <CommentSection postId={post.id} />
         </div>
